@@ -12,7 +12,6 @@ import config
 from YukkiMusic.utils.database import is_on_off
 from YukkiMusic.utils.formatters import time_to_seconds
 
-
 async def shell_cmd(cmd):
     proc = await asyncio.create_subprocess_shell(
         cmd,
@@ -21,12 +20,12 @@ async def shell_cmd(cmd):
     )
     out, errorz = await proc.communicate()
     if errorz:
-        if "unavailable videos are hidden" in (errorz.decode("utf-8")).lower():
-            return out.decode("utf-8")
+        error_message = errorz.decode("utf-8").lower()
+        if "unavailable videos are hidden" in error_message or "age restricted" in error_message:
+            return out.decode("utf-8"), "age_restricted"
         else:
-            return errorz.decode("utf-8")
-    return out.decode("utf-8")
-
+            return errorz.decode("utf-8"), "other_error"
+    return out.decode("utf-8"), None
 
 class YouTubeAPI:
     def __init__(self):
@@ -135,6 +134,9 @@ class YouTubeAPI:
         if stdout:
             return 1, stdout.decode().split("\n")[0]
         else:
+            error_message = stderr.decode().lower()
+            if "age restricted" in error_message:
+                return 0, "age_restricted"
             return 0, stderr.decode()
 
     async def playlist(self, link, limit, user_id, videoid: Union[bool, str] = None):
@@ -142,9 +144,11 @@ class YouTubeAPI:
             link = self.listbase + link
         if "&" in link:
             link = link.split("&")[0]
-        playlist = await shell_cmd(
+        playlist, error = await shell_cmd(
             f"yt-dlp -i --get-id --flat-playlist --playlist-end {limit} --skip-download {link}"
         )
+        if error == "age_restricted":
+            return [], "age_restricted"
         try:
             result = playlist.split("\n")
             for key in result:
@@ -152,7 +156,7 @@ class YouTubeAPI:
                     result.remove(key)
         except:
             result = []
-        return result
+        return result, None
 
     async def track(self, link: str, videoid: Union[bool, str] = None):
         if videoid:
@@ -193,19 +197,19 @@ class YouTubeAPI:
                 if not "dash" in str(format["format"]).lower():
                     try:
                         format["format"]
-                        format["filesize"]
-                        format["format_id"]
-                        format["ext"]
-                        format["format_note"]
+                        filesize = format.get("filesize", "N/A")
+                        format_id = format.get("format_id", "N/A")
+                        ext = format.get("ext", "N/A")
+                        format_note = format.get("format_note", "N/A")
                     except:
                         continue
                     formats_available.append(
                         {
                             "format": format["format"],
-                            "filesize": format["filesize"],
-                            "format_id": format["format_id"],
-                            "ext": format["ext"],
-                            "format_note": format["format_note"],
+                            "filesize": filesize,
+                            "format_id": format_id,
+                            "ext": ext,
+                            "format_note": format_note,
                             "yturl": link,
                         }
                     )
