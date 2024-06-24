@@ -2,7 +2,7 @@ from pyrogram import Client
 from typing import List
 
 # Import fungsi database yang telah Anda definisikan
-from utils.database import get_served_chats  # Ganti dengan nama file database Anda jika berbeda
+from YukkiMusic.utils.database import get_served_chats  # Ganti dengan nama file database Anda jika berbeda
 
 async def get_group_names(app: Client) -> List[str]:
   """
