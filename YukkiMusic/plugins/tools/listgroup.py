@@ -1,11 +1,16 @@
-
 from pyrogram import Client, filters
 from pyrogram.errors import FloodWait
-from pyrogram.types import ChatPrivileges
+from pyrogram.types import ChatPrivileges, Message
 import time
+import asyncio 
 
 from YukkiMusic import app
 from YukkiMusic.misc import SUDOERS
+from YukkiMusic.utils.database.memorydatabase import (
+    get_active_chats,
+    get_active_video_chats,
+)
+
 
 @app.on_message(filters.command("listgroup") & SUDOERS)
 async def list_groups(client, message):
