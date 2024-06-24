@@ -1,40 +1,13 @@
-from pyrogram import Client, filters
-from pyrogram.errors import FloodWait
-from pyrogram.types import ChatPrivileges, Message
-import time
-import asyncio 
-
 from YukkiMusic import app
-from YukkiMusic.misc import SUDOERS
+from pyrogram import Client
+from utils.groups import get_group_names
 
-from pymongo import MongoClient
-from config import MONGO_DB_URI
 
-# Inisialisasi MongoDB client
-mongo_client = MongoClient(MONGO_DB_URI)
-db = mongo_client.grouplist
-groups_collection = db.groups
-
-@app.on_message(filters.group & filters.new_chat_members)
-async def new_group_handler(client, message):
-    chat_id = message.chat.id
-    chat_name = message.chat.title
-
-    # Cek apakah grup sudah ada di database
-    if not groups_collection.find_one({"chat_id": chat_id}):
-        # Menyimpan grup ke database
-        groups_collection.insert_one({"chat_id": chat_id, "chat_name": chat_name})
-        await message.reply_text(f"Grup '{chat_name}' dengan ID {chat_id} telah ditambahkan ke database.")
-        print(f"Grup '{chat_name}' dengan ID {chat_id} telah ditambahkan ke database.")
-
-@app.on_message(filters.command("listgroups") & SUDOERS)
-async def list_groups_handler(client, message):
-    # Ambil daftar grup dari database
-    groups = groups_collection.find()
-    response = "Daftar grup yang menggunakan bot ini:\n"
-    for group in groups:
-        response += f"{group['chat_name']} (ID: {group['chat_id']})\n"
-    if response == "Daftar grup yang menggunakan bot ini:\n":
-        response = "Tidak ada grup yang menggunakan bot ini."
-    await message.reply_text(response)
-    print("List grup dikirim.")
+@app.on_message()
+async def handle_message(client, message):
+    if "/grouplist" in message.text:
+        group_names = await get_group_names(app)
+        if group_names:
+            await message.reply_text("\n".join(group_names))
+        else:
+            await message.reply_text("Bot belum ditambahkan ke grup mana pun.")
