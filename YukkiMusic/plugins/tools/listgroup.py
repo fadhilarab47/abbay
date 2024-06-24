@@ -6,29 +6,37 @@ import asyncio
 
 from YukkiMusic import app
 from YukkiMusic.misc import SUDOERS
-from YukkiMusic.utils.database.memorydatabase import (
-    get_active_chats,
-    get_active_video_chats,
-)
+
+from pyrogram import Client, filters
+from pymongo import MongoClient
+from config import MONGO_DB_URI
 
 
-@app.on_message(filters.command("listgroup") & SUDOERS)
-async def list_groups(client, message):
-    try:
-        group_list = []
-        async for dialog in client.get_dialogs():
-            if dialog.chat.type in ["group", "supergroup"]:
-                group_list.append(dialog.chat)
+# Inisialisasi MongoDB client
+mongo_client = MongoClient(MONGO_DB_URI)
+db = mongo_client.grouplist
+groups_collection = db.groups
 
-        if not group_list:
-            await message.reply("Bot tidak ada di grup manapun.")
-            return
+@app.on_message(filters.group & filters.new_chat_members)
+async def new_group_handler(client, message):
+    chat_id = message.chat.id
+    chat_name = message.chat.title
 
-        response = "Daftar grup yang menggunakan bot:\n"
-        for group in group_list:
-            response += f"- {group.title} (ID: {group.id})\n"
+    # Cek apakah grup sudah ada di database
+    if not groups_collection.find_one({"chat_id": chat_id}):
+        # Menyimpan grup ke database
+        groups_collection.insert_one({"chat_id": chat_id, "chat_name": chat_name})
+        await message.reply_text(f"Grup '{chat_name}' dengan ID {chat_id} telah ditambahkan ke database.")
 
-        await message.reply(response)
+@app.on_message(filters.command("groups") & SUDOERS)
+async def list_groups_handler(client, message):
+    # Ambil daftar grup dari database
+    groups = groups_collection.find()
+    response = "Daftar grup yang menggunakan bot ini:\n"
+    for group in groups:
+        response += f"{group['chat_name']} (ID: {group['chat_id']})\n"
+    await message.reply_text(response)
 
-    except Exception as e:
-        await message.reply(f"Terjadi kesalahan: {str(e)}")
+if __name__ == "__main__":
+    bot.run()
+    
