@@ -7,7 +7,7 @@ import time
 from YukkiMusic import app
 from YukkiMusic.misc import SUDOERS
 
-@app.on_message(filters.command("listgc") & SUDOERS)
+@app.on_message(filters.command("listgroup") & SUDOERS)
 async def list_groups(client, message):
     try:
         group_list = []
