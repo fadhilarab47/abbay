@@ -1,6 +1,6 @@
 from YukkiMusic import app
 from pyrogram import Client
-from utils.groups import get_group_names
+from YukkiMusic.utils.groups import get_group_names
 
 
 @app.on_message()
