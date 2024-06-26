@@ -1,16 +1,8 @@
-#
-# Copyright (C) 2024 by TheTeamVivek@Github, < https://github.com/TheTeamVivek >.
-#
-# This file is part of < https://github.com/TheTeamVivek/YukkiMusic > project,
-# and is released under the MIT License .
-# Please see < https://github.com/TheTeamVivek/YukkiMusic/blob/master/LICENSE >
-#
-# All rights reserved.
-#
-
 from config import YOUTUBE_IMG_URL
-from youtubesearchpython.__future__ import VideosSearch
+from youtubesearchpython.future import VideosSearch
+import logging
 
+logging.basicConfig(level=logging.INFO)
 
 async def gen_thumb(videoid):
     try:
@@ -20,8 +12,8 @@ async def gen_thumb(videoid):
             thumbnail = result["thumbnails"][0]["url"].split("?")[0]
         return thumbnail
     except Exception as e:
+        logging.error(f"Error generating thumbnail for video ID {videoid}: {e}")
         return YOUTUBE_IMG_URL
-
 
 async def gen_qthumb(vidid):
     try:
@@ -31,4 +23,6 @@ async def gen_qthumb(vidid):
             thumbnail = result["thumbnails"][0]["url"].split("?")[0]
         return thumbnail
     except Exception as e:
+        logging.error(f"Error generating quick thumbnail for video ID {vidid}: {e}")
         return YOUTUBE_IMG_URL
+        
