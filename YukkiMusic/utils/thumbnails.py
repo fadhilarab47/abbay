@@ -1,7 +1,12 @@
 from config import YOUTUBE_IMG_URL
 from youtubesearchpython.future import VideosSearch
 import logging
+from youtubesearchpython import VideosSearch
 
+videosSearch = VideosSearch('NoCopyrightSounds', limit = 10)
+
+print(videosSearch.result())
+   
 logging.basicConfig(level=logging.INFO)
 
 async def gen_thumb(videoid):
