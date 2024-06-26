@@ -1,12 +1,11 @@
 from config import YOUTUBE_IMG_URL
-from youtubesearchpython.future import VideosSearch
-import logging
 from youtubesearchpython import VideosSearch
+import logging
 
 videosSearch = VideosSearch('NoCopyrightSounds', limit = 10)
 
 print(videosSearch.result())
-   
+
 logging.basicConfig(level=logging.INFO)
 
 async def gen_thumb(videoid):
@@ -30,4 +29,3 @@ async def gen_qthumb(vidid):
     except Exception as e:
         logging.error(f"Error generating quick thumbnail for video ID {vidid}: {e}")
         return YOUTUBE_IMG_URL
-        
