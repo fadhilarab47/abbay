@@ -72,7 +72,7 @@ SONG_DOWNLOAD_DURATION = int(
 # You'll need a Private Group ID for this.
 LOG_GROUP_ID = int(getenv("LOG_GROUP_ID", ""))
 
-MUSIC_BOT_NAME = int(getenv("MUSIC_BOT_NAME", "ARAB X ROBOT"))
+MUSIC_BOT_NAME = getenv("MUSIC_BOT_NAME","ArabxRobot")
 
 # Your User ID.
 OWNER_ID = list(
