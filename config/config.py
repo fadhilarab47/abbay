@@ -249,7 +249,7 @@ TELEGRAM_VIDEO_URL = getenv(
 
 STREAM_IMG_URL = getenv(
     "STREAM_IMG_URL",
-    "https://telegra.ph/file/e24f4a5f695ec5576a8f3.jpg",
+    "https://telegra.ph//file/461e5980294c2fb91f973.jpg",
 )
 
 SOUNCLOUD_IMG_URL = getenv(
@@ -259,7 +259,7 @@ SOUNCLOUD_IMG_URL = getenv(
 
 YOUTUBE_IMG_URL = getenv(
     "YOUTUBE_IMG_URL",
-    "https://telegra.ph/file/76d29aa31c40a7f026d7e.jpg",
+    "https://telegra.ph//file/461e5980294c2fb91f973.jpg",
 )
 
 SPOTIFY_ARTIST_IMG_URL = getenv(
