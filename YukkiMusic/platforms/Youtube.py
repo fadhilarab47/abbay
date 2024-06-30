@@ -139,13 +139,12 @@ class YouTubeAPI:
             thumbnail = result["thumbnails"][0]["url"].split("?")[0]
         return thumbnail
 
-    async def video(
-        self, link: str, videoid: Union[bool, str] = None
-    ):
-        if videoid:
-            link = self.base + link
-        if "&" in link:
-            link = link.split("&")[0]
+    async def video(self, link: str, videoid: Union[bool, str] = None):
+    if videoid:
+        link = self.base + link
+    if "&" in link:
+        link = link.split("&")[0]
+    try:
         proc = await asyncio.create_subprocess_exec(
             "yt-dlp",
             "-g",
@@ -156,10 +155,14 @@ class YouTubeAPI:
             stderr=asyncio.subprocess.PIPE,
         )
         stdout, stderr = await proc.communicate()
-        if stdout:
-            return 1, stdout.decode().split("\n")[0]
-        else:
-            return 0, stderr.decode()
+        if proc.returncode != 0:
+            raise Exception(stderr.decode().strip())
+        return 1, stdout.decode().split("\n")[0]
+    except Exception as e:
+        error_message = str(e).lower()
+        if "unavailable videos are hidden" in error_message:
+            return 0, "Video is unavailable or restricted."
+        return 0, error_message
 
     async def playlist(
         self, link, limit, user_id, videoid: Union[bool, str] = None
@@ -261,22 +264,13 @@ class YouTubeAPI:
         )[0]
         return title, duration_min, thumbnail, vidid
 
-    async def download(
-        self,
-        link: str,
-        mystic,
-        video: Union[bool, str] = None,
-        videoid: Union[bool, str] = None,
-        songaudio: Union[bool, str] = None,
-        songvideo: Union[bool, str] = None,
-        format_id: Union[bool, str] = None,
-        title: Union[bool, str] = None,
-    ) -> str:
-        if videoid:
-            link = self.base + link
-        loop = asyncio.get_running_loop()
+    async def download(self, link: str, mystic, video: Union[bool, str] = None, videoid: Union[bool, str] = None, songaudio: Union[bool, str] = None, songvideo: Union[bool, str] = None, format_id: Union[bool, str] = None, title: Union[bool, str] = None) -> str:
+    if videoid:
+        link = self.base + link
+    loop = asyncio.get_running_loop()
 
-        def audio_dl():
+    def audio_dl():
+        try:
             ydl_optssx = {
                 "format": "bestaudio/best",
                 "outtmpl": "downloads/%(id)s.%(ext)s",
@@ -287,15 +281,16 @@ class YouTubeAPI:
             }
             x = yt_dlp.YoutubeDL(ydl_optssx)
             info = x.extract_info(link, False)
-            xyz = os.path.join(
-                "downloads", f"{info['id']}.{info['ext']}"
-            )
+            xyz = os.path.join("downloads", f"{info['id']}.{info['ext']}")
             if os.path.exists(xyz):
                 return xyz
             x.download([link])
             return xyz
+        except Exception as e:
+            return str(e)
 
-        def video_dl():
+    def video_dl():
+        try:
             ydl_optssx = {
                 "format": "(bestvideo[height<=?720][width<=?1280][ext=mp4])+(bestaudio[ext=m4a])",
                 "outtmpl": "downloads/%(id)s.%(ext)s",
@@ -306,13 +301,54 @@ class YouTubeAPI:
             }
             x = yt_dlp.YoutubeDL(ydl_optssx)
             info = x.extract_info(link, False)
-            xyz = os.path.join(
-                "downloads", f"{info['id']}.{info['ext']}"
-            )
+            xyz = os.path.join("downloads", f"{info['id']}.{info['ext']}")
             if os.path.exists(xyz):
                 return xyz
             x.download([link])
             return xyz
+        except Exception as e:
+            return str(e)
+
+    try:
+        if songvideo:
+            await loop.run_in_executor(None, song_video_dl)
+            fpath = f"downloads/{title}.mp4"
+            return fpath
+        elif songaudio:
+            await loop.run_in_executor(None, song_audio_dl)
+            fpath = f"downloads/{title}.mp3"
+            return fpath
+        elif video:
+            if await is_on_off(config.YTDOWNLOADER):
+                direct = True
+                downloaded_file = await loop.run_in_executor(None, video_dl)
+                if isinstance(downloaded_file, str) and downloaded_file.startswith("Error"):
+                    raise Exception(downloaded_file)
+            else:
+                proc = await asyncio.create_subprocess_exec(
+                    "yt-dlp",
+                    "-g",
+                    "-f",
+                    "best[height<=?720][width<=?1280]",
+                    f"{link}",
+                    stdout=asyncio.subprocess.PIPE,
+                    stderr=asyncio.subprocess.PIPE,
+                )
+                stdout, stderr = await proc.communicate()
+                if stdout:
+                    downloaded_file = stdout.decode().split("\n")[0]
+                    direct = None
+                else:
+                    raise Exception(stderr.decode().strip())
+        else:
+            direct = True
+            downloaded_file = await loop.run_in_executor(None, audio_dl)
+            if isinstance(downloaded_file, str) and downloaded_file.startswith("Error"):
+                raise Exception(downloaded_file)
+        return downloaded_file, direct
+    except Exception as e:
+        return str(e), None
+
 
         def song_video_dl():
             formats = f"{format_id}+140"
