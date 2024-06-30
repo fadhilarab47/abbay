@@ -9,7 +9,7 @@ from pyrogram.types import Message
 from yt_dlp import YoutubeDL
 from youtubesearchpython.__future__ import VideosSearch
 
-from YukkiMusic import config
+import config
 from YukkiMusic.utility.database import is_on_off
 from YukkiMusic.utility.formatters import time_to_seconds
 
