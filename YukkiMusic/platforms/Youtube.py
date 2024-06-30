@@ -10,8 +10,8 @@ from yt_dlp import YoutubeDL
 from youtubesearchpython.__future__ import VideosSearch
 
 from config import *
-from YukkiMusic.utility.database import is_on_off
-from YukkiMusic.utility.formatters import time_to_seconds
+from YukkiMusic.utils.database import is_on_off
+from YukkiMusic.utils.formatters import time_to_seconds
 
 
 async def shell_cmd(cmd):
