@@ -79,21 +79,35 @@ class YouTubeAPI:
         return text[offset : offset + length]
 
     async def details(self, link: str, videoid: Union[bool, str] = None):
-        if videoid:
-            link = self.base + link
-        if "&" in link:
-            link = link.split("&")[0]
+    if videoid:
+        link = self.base + link
+    if "&" in link:
+        link = link.split("&")[0]
+    
+    try:
         results = VideosSearch(link, limit=1)
-        for result in (await results.next())["result"]:
-            title = result["title"]
-            duration_min = result["duration"]
-            thumbnail = result["thumbnails"][0]["url"].split("?")[0]
-            vidid = result["id"]
+        search_results = await results.next()
+        if not search_results["result"]:
+            raise ValueError("No results found for the given link.")
+        
+        for result in search_results["result"]:
+            title = result.get("title", "Unknown Title")
+            duration_min = result.get("duration", "0:00")
+            thumbnail = result.get("thumbnails", [{}])[0].get("url", "").split("?")[0]
+            vidid = result.get("id", "Unknown ID")
+            
             if str(duration_min) == "None":
                 duration_sec = 0
             else:
                 duration_sec = int(time_to_seconds(duration_min))
+        
         return title, duration_min, duration_sec, thumbnail, vidid
+    
+    except Exception as e:
+        # Log the error message
+        print(f"Error retrieving details for link {link}: {e}")
+        return "ɢᴀɢᴀʟ ᴍᴇɴɢᴀᴍʙɪʟ ᴅᴇᴛᴀɪʟ ᴛʀᴇᴋ. ᴄᴏʙᴀ ᴍᴀɪɴᴋᴀɴ ʏᴀɴɢ ʟᴀɪɴ.", None, None, None, None
+
 
     async def title(self, link: str, videoid: Union[bool, str] = None):
         if videoid:
