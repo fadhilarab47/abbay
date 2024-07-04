@@ -72,7 +72,7 @@ SONG_DOWNLOAD_DURATION = int(
 # You'll need a Private Group ID for this.
 LOG_GROUP_ID = int(getenv("LOG_GROUP_ID", ""))
 
-MUSIC_BOT_NAME = getenv("MUSIC_BOT_NAME","ArabxRobot")
+MUSIC_BOT_NAME = getenv("MUSIC_BOT_NAME","Abbay Music")
 
 # Your User ID.
 OWNER_ID = list(
@@ -131,7 +131,7 @@ TELEGRAM_DOWNLOAD_EDIT_SLEEP = int(getenv("TELEGRAM_EDIT_SLEEP", "5"))
 
 
 # Your Github Repo.. Will be shown on /start Command
-GITHUB_REPO = getenv("GITHUB_REPO", "https://github.com/TeamYukki/YukkiMusicBot")
+GITHUB_REPO = getenv("GITHUB_REPO", "https://github.com/")
 
 
 # Spotify Client.. Get it from https://developer.spotify.com/dashboard
@@ -142,7 +142,7 @@ SPOTIFY_CLIENT_SECRET = getenv(
 
 
 # Maximum number of video calls allowed on bot. You can later set it via /set_video_limit on telegram
-VIDEO_STREAM_LIMIT = int(getenv("VIDEO_STREAM_LIMIT", "5"))
+VIDEO_STREAM_LIMIT = int(getenv("VIDEO_STREAM_LIMIT", "10"))
 
 
 # Maximum Limit Allowed for users to save playlists on bot's server
@@ -167,7 +167,7 @@ TG_VIDEO_FILESIZE_LIMIT = int(
 
 # If you want your bot to setup the commands automatically in the bot's menu set it to true.
 # Refer to https://i.postimg.cc/Bbg3LQTG/image.png
-SET_CMDS = getenv("SET_CMDS", "False")
+SET_CMDS = getenv("SET_CMDS", "True")
 
 
 # You'll need a Pyrogram String Session for these vars. Generate String from our session generator bot @YukkiStringBot
@@ -208,33 +208,33 @@ autoclean = []
 PHOTO = list(
     filter(
         None,
-        getenv("PHOTO_LINKS", "").split(),
+        getenv("PHOTO_LINKS", "https://telegra.ph//file/932a87f0cf571c79c2833.jpg").split(),
     )
 )
 
 
 START_IMG_URL = getenv(
     "START_IMG_URL",
-    "https://te.legra.ph/file/4ec5ae4381dffb039b4ef.jpg",
+    "https://telegra.ph//file/932a87f0cf571c79c2833.jpg",
 )
 PING_IMG_URL = getenv(
     "PING_IMG_URL",
-    "https://telegra.ph//file/fdc145a9682b8e6c835e8.jpg",
+    "https://telegra.ph//file/932a87f0cf571c79c2833.jpg",
 )
 
 PLAYLIST_IMG_URL = getenv(
     "PLAYLIST_IMG_URL",
-    "https://telegra.ph/file/f4edfbd83ec3150284aae.jpg",
+    "https://telegra.ph//file/932a87f0cf571c79c2833.jpg",
 )
 
 GLOBAL_IMG_URL = getenv(
     "GLOBAL_IMG_URL",
-    "https://telegra.ph//file/fdc145a9682b8e6c835e8.jpg",
+    "https://telegra.ph//file/932a87f0cf571c79c2833.jpg",
 )
 
 STATS_IMG_URL = getenv(
     "STATS_IMG_URL",
-    "https://telegra.ph//file/fdc145a9682b8e6c835e8.jpg",
+    "https://telegra.ph//file/932a87f0cf571c79c2833.jpg",
 )
 
 TELEGRAM_AUDIO_URL = getenv(
